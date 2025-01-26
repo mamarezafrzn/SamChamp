@@ -19,3 +19,63 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+h1{
+  color: white;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+
+
+input:focus,
+input:focus::placeholder {
+  outline: white;
+  border-color: rgba(255, 255, 255, 0.87);
+  color: white;
+}
+
+
+
+/* Base style for the checkbox */
+input[type="checkbox"] {
+  -webkit-appearance: none;  /* Removes default styling on WebKit-based browsers */
+  -moz-appearance: none;     /* Removes default styling on Firefox */
+  appearance: none;          /* Removes default styling on modern browsers */
+  width: 20px;               /* Set the size of the checkbox */
+  height: 20px;              /* Set the size of the checkbox */
+  border: 2px solid white;   /* White border */
+  background-color: rgba(35, 35, 35, 1);   /* Black background when unchecked */
+  border-radius: 50%;        /* Rounded corners to mimic checkbox shape */
+  outline: none;             /* Removes the default focus outline */
+  position: relative;        /* To position the checkmark */
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+/* When the checkbox is checked, change the background and add a black gap */
+input[type="checkbox"]:checked {
+  background-color: white;  /* White background when checked */
+  border-color: white;      /* White border remains */
+  box-shadow: inset 0 0 0 3px rgba(35, 35, 35, 1); /* 3px black gap between the white background and border */
+}
+
+/* Remove the default blue tick inside the checkbox */
+input[type="checkbox"]:checked::before {
+  content: none; /* No checkmark */
+}
+
+/* Optional: Remove the blue outline when focused */
+input[type="checkbox"]:focus {
+  outline: none; /* Ensures no blue outline */
+}
+
+
+
+
+/* ::-webkit-scrollbar {
+  display: none;
+}
+.body {
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+} */
