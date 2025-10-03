@@ -8,7 +8,10 @@ export const API_ROUTES = {
         APPLE: 'api/login/apple'
     },
     USER:{
-        PROFILE:'api/profile',
+        PROFILE:{
+            GET_PROFILE:'api/profile',
+            UPDATE_PROFILE:'api/update-profile'
+        },
         TEAMS: 'api/teams/grouped-by-league'
     }
 }

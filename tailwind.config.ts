@@ -19,6 +19,7 @@ export default {
         "yellow-sun-dark" : "rgba(227, 147, 0, 1)",
         "yellow-dark" : "rgba(135, 95, 22, 1)",
         "brown-umber" : "rgba(37, 35, 23, 1)",
+        "grey-dark" : "rgba(30, 30, 30, 1)",
         "grey-charcoal": "rgba(35, 35, 35, 1)",
         "grey-smoke": "rgba(44, 44, 44, 1)",
         "grey-slate": "rgba(56, 56, 56, 1)",

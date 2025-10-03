@@ -1,7 +1,11 @@
+
 import LoadingWrapper from "@/components/loading_wrapper";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import type { Metadata } from "next";
 import { Geist, Rubik, Roboto } from "next/font/google";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -29,11 +33,13 @@ export const metadata: Metadata = {
 
 
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body

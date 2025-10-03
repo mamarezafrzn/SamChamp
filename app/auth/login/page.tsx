@@ -30,7 +30,7 @@ const Login: FC = () => {
   //if the user exists move to profile page
   const {user} = useSelector((state:RootState)=>state.auth)
   if(user){
-    // router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT)
+    router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT)
     console.log("login success")
 
   }

@@ -6,21 +6,28 @@ import xboxIcon from "../../../../public/images/xbox-icon.svg";
 import playstationIcon from "../../../../public/images/playstation-icon.svg";
 import FormInput from "@/components/form/form-input";
 
-const PlatformSelector: FC = () => {
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+const PlatformSelector: FC = ({ platformChangeHandler }) => {
+  const [selectedPlatforms, setSelectedPlatforms] = useState();
+  const [gamerTag, setGamerTag] = useState();
 
   const platforms = [
-    { id: "playstation", icon: pcIcon, label: "PlayStation" },
+    { id: "headphones", icon: pcIcon, label: "PC" },
     { id: "xbox", icon: xboxIcon, label: "Xbox" },
-    { id: "headphones", icon: playstationIcon, label: "Headphones" },
+    { id: "ps4", icon: playstationIcon, label: "PlayStation" },
   ];
 
+  const onGamerTagChange = (value: string) => {
+    setGamerTag(value);
+    platformChangeHandler({
+      game_id: value,
+      game_machine: selectedPlatforms || "",
+    });
+  };
+
   const toggleSelection = (id: string): void => {
-    setSelectedPlatforms((prev) =>
-      prev.includes(id)
-        ? prev.filter((platform) => platform !== id)
-        : [...prev, id]
-    );
+    const newPlatform = selectedPlatforms === id ? null : id;
+    setSelectedPlatforms(newPlatform);
+    platformChangeHandler({ game_id:gamerTag, game_machine: newPlatform || "" });
   };
 
   return (
@@ -34,7 +41,7 @@ const PlatformSelector: FC = () => {
             <div
               key={platform.id}
               className={`flex flex-col items-center justify-center w-full h-12 rounded-lg cursor-pointer transition border text-white ${
-                selectedPlatforms.includes(platform.id)
+                selectedPlatforms == platform.id
                   ? "border-yellow-dark bg-brown-umber"
                   : "border-grey-smoke bg-grey-smoke"
               }`}
@@ -47,12 +54,15 @@ const PlatformSelector: FC = () => {
       </div>
       <div
         className={`transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden ${
-          selectedPlatforms.length >= 1
-            ? "max-h-40 opacity-100"
-            : "max-h-0 opacity-0"
+          selectedPlatforms ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <FormInput label="Gamer Tag" placeholder="EX. Thehunter" type="text" />
+        <FormInput
+          label="Gamer Tag"
+          placeholder="EX. Thehunter"
+          type="text"
+          sendValue={onGamerTagChange}
+        />
       </div>
     </>
   );

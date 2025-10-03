@@ -55,62 +55,62 @@ export const auth =
     }
   };
 
-// export const authPlatforms = (apiRoute: string) => async (dispatch) => {
-
-//   try {
-//     const response: AxiosResponse<ApiResponse> = await axios.get(
-//       `${API_ROUTES.MAIN}${apiRoute}`
-//     );
-//     Cookies.set("authToken", response.data.data.token?.access_token);
-//     dispatch(authSuccess(response.data));
-//     console.log(response)
-//   } catch (error) {
-//     const axiosError = error as AxiosError<ErrorResponse>;
-//     dispatch(authError(axiosError));
-
-//     if (axiosError.response?.data?.data) {
-//       const errorKeys = Object.keys(axiosError.response.data.data);
-
-
-//       errorKeys.forEach((key) => {
-//         console.log(`${key}: ${axiosError.response?.data?.data[key]}`);
-//       });
-//     } else {
-//       console.log("Authentication failed. No error data found.");
-//     }
-//   }
-// };
-
-export const authPlatforms = (
-  apiRoute: string
-): ThunkAction<void, RootState, unknown, any> => async (dispatch) => {
+export const authPlatforms = (apiRoute: string) => async (dispatch) => {
 
   try {
     const response: AxiosResponse<ApiResponse> = await axios.get(
-      `${API_ROUTES.MAIN}${apiRoute}`,
-      {
-        maxRedirects: 0,  // Prevent Axios from following redirects
-        validateStatus: (status) => status === 302 || status < 400,  // Allow 302 status
-      }
+      `${API_ROUTES.MAIN}${apiRoute}`
     );
-  
-
-    if (response.status === 302 && response.headers.location) {
-      // Redirect to the external login URL
-      // window.location.href = response.headers.location;
-    } else {
-      // Handle successful authentication response
-      const token = response.data.data.token?.access_token;
-      if (token) {
-        Cookies.set("authToken", token, { secure: true, sameSite: "strict" });
-      }
-      dispatch(authSuccess(response.data));
-    }
+    Cookies.set("authToken", response.data.data.token?.access_token);
+    dispatch(authSuccess(response.data));
+    console.log(response)
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     dispatch(authError(axiosError));
-  
-    console.error("Authentication failed:", axiosError.message);
+
+    if (axiosError.response?.data?.data) {
+      const errorKeys = Object.keys(axiosError.response.data.data);
+
+
+      errorKeys.forEach((key) => {
+        console.log(`${key}: ${axiosError.response?.data?.data[key]}`);
+      });
+    } else {
+      console.log("Authentication failed. No error data found.");
+    }
   }
-  
 };
+
+// export const authPlatforms = (
+//   apiRoute: string
+// ): ThunkAction<void, RootState, unknown, any> => async (dispatch) => {
+
+//   try {
+//     const response: AxiosResponse<ApiResponse> = await axios.get(
+//       `${API_ROUTES.MAIN}${apiRoute}`,
+//       {
+//         maxRedirects: 0,  // Prevent Axios from following redirects
+//         validateStatus: (status) => status === 302 || status < 400,  // Allow 302 status
+//       }
+//     );
+  
+
+//     if (response.status === 302 && response.headers.location) {
+//       // Redirect to the external login URL
+//       // window.location.href = response.headers.location;
+//     } else {
+//       // Handle successful authentication response
+//       const token = response.data.data.token?.access_token;
+//       if (token) {
+//         Cookies.set("authToken", token, { secure: true, sameSite: "strict" });
+//       }
+//       dispatch(authSuccess(response.data));
+//     }
+//   } catch (error) {
+//     const axiosError = error as AxiosError<ErrorResponse>;
+//     dispatch(authError(axiosError));
+  
+//     console.error("Authentication failed:", axiosError.message);
+//   }
+  
+// };

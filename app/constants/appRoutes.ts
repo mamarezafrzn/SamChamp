@@ -5,6 +5,6 @@ export const APP_ROUTES = {
     NEW_PASSWORD: "/auth/new-password",
   },
   PROFILE: {
-    EDIT_ACCOUNT: "auth/profike/edit-account",
+    EDIT_ACCOUNT: "/profile/edit-account",
   },
 };
