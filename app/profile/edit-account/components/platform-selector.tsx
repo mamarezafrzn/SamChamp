@@ -54,8 +54,10 @@ const PlatformSelector: FC<PlatformSelectorProps> = ({
         </p>
         <div className="flex justify-between gap-4 w-full">
           {PLATFORMS.map((platform) => (
-            <div
+            <button
               key={platform.id}
+              type="button"
+              aria-pressed={selectedPlatform === platform.id}
               className={`flex flex-col items-center justify-center w-full h-12 rounded-lg cursor-pointer transition border text-white ${
                 selectedPlatform === platform.id
                   ? "border-yellow-dark bg-brown-umber"
@@ -64,7 +66,7 @@ const PlatformSelector: FC<PlatformSelectorProps> = ({
               onClick={() => toggleSelection(platform.id)}
             >
               <Image src={platform.icon} alt={platform.label} />
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -77,7 +79,8 @@ const PlatformSelector: FC<PlatformSelectorProps> = ({
           label="Gamer Tag"
           placeholder="EX. Thehunter"
           type="text"
-          sendValue={onGamerTagChange}
+          value={gamerTag}
+          onChange={onGamerTagChange}
         />
       </div>
     </>

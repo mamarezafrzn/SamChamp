@@ -1,39 +1,35 @@
 "use client";
 
-import { ChangeEvent, FC, HTMLInputTypeAttribute, useState } from "react";
+import { FC, HTMLInputTypeAttribute, useState } from "react";
 import Image from "next/image";
 
 import hideImg from "../../public/images/hide.svg";
 import visibilityImg from "../../public/images/visibility.svg";
 
 interface FormInputProps {
-  label?: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
   /** Maximum length; also shows a character counter. */
   count?: number;
-  sendValue?: (value: string) => void;
   error?: string;
 }
 
 const FormInput: FC<FormInputProps> = ({
-  label = "Input",
-  placeholder = "Your data",
+  label,
+  value,
+  onChange,
+  placeholder,
   type = "text",
   count,
   error,
-  sendValue,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [inputData, setInputData] = useState("");
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prevState) => !prevState);
-  };
-
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInputData(e.target.value);
-    sendValue?.(e.target.value);
   };
 
   const isPasswordType = type === "password";
@@ -43,16 +39,16 @@ const FormInput: FC<FormInputProps> = ({
       <input
         type={isPasswordType && isPasswordVisible ? "text" : type}
         placeholder={placeholder}
-        value={inputData}
-        onChange={onInputChange}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         maxLength={count}
         className={`${
           error && "border-red-error"
         } w-full h-[3.5rem] bg-grey-smoke border border-grey-silver rounded-2xl px-5 py-4`}
       />
-      {count && (
+      {count !== undefined && (
         <p className="absolute top-0 right-0">
-          {inputData.length}/{count}
+          {value.length}/{count}
         </p>
       )}
       {isPasswordType && (

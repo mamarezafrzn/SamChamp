@@ -76,16 +76,18 @@ const AvatarSelectModal: FC<AvatarSelectModalProps> = ({
           </h2>
           <ul className="flex flex-row flex-wrap gap-[1.2rem]">
             {teamList.map((team) => (
-              <li
-                key={team.id}
-                onClick={() => avatarClickHandler(team)}
-                className="ml-4 cursor-pointer"
-              >
-                <img
-                  src={team.flag}
-                  alt={team.title}
-                  className="w-[65px] h-[65px]"
-                />
+              <li key={team.id} className="ml-4">
+                <button
+                  type="button"
+                  onClick={() => avatarClickHandler(team)}
+                  className="block cursor-pointer"
+                >
+                  <img
+                    src={team.flag}
+                    alt={team.title}
+                    className="w-[65px] h-[65px]"
+                  />
+                </button>
               </li>
             ))}
           </ul>

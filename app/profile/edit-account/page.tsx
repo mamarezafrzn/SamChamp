@@ -11,6 +11,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { updateUserProfile } from "@/store/slices/profile/profileActions";
 
 import type { Platform } from "@/types/profile";
+import { validateBirthday } from "@/utils/validation";
 
 import profileImg from "../../../public/images/Brentford.svg";
 import editImg from "../../../public/images/Edit.svg";
@@ -35,6 +36,7 @@ const EditAccount: FC = () => {
   // TODO(step 9): include in the request once the API field name is confirmed.
   const [userId, setUserId] = useState("");
   const [birthday, setBirthday] = useState("");
+  const [birthdayError, setBirthdayError] = useState("");
   const [platform, setPlatform] = useState<Platform>({
     game_machine: "",
     game_id: "",
@@ -53,6 +55,10 @@ const EditAccount: FC = () => {
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const error = validateBirthday(birthday);
+    setBirthdayError(error);
+    if (error) return;
+
     dispatch(
       updateUserProfile({
         firstname: name,
@@ -81,9 +87,11 @@ const EditAccount: FC = () => {
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div
+          <button
+            type="button"
             onClick={onShowModal}
-            className="relative w-fit m-auto mb-10 cursor-pointer"
+            aria-label="Change profile picture"
+            className="relative block w-fit m-auto mb-10 cursor-pointer"
           >
             <Image
               src={avatar.flag || profileImg}
@@ -92,37 +100,37 @@ const EditAccount: FC = () => {
               height={100}
               className="w-[100px] h-[100px] object-contain"
             />
-            <button
-              type="button"
-              className="bg-yellow-sun rounded-full p-2.5 absolute bottom-0 right-0"
-            >
-              <Image src={editImg} alt="Edit profile picture" />
-            </button>
-          </div>
+            <span className="bg-yellow-sun rounded-full p-2.5 absolute bottom-0 right-0">
+              <Image src={editImg} alt="" />
+            </span>
+          </button>
           <div className="flex flex-col gap-4">
             <FormInput
               label="Name"
               placeholder="EX. John"
               type="text"
-              sendValue={setName}
+              value={name}
+              onChange={setName}
             />
             <FormInput
               label="Last Name"
               placeholder="EX. Wick"
               type="text"
-              sendValue={setLastName}
+              value={lastName}
+              onChange={setLastName}
             />
             <FormInput
               label="ID"
               placeholder="Maximum 14 characters"
               type="text"
               count={14}
-              sendValue={setUserId}
+              value={userId}
+              onChange={setUserId}
             />
-            <BirthdayInput onDateChange={setBirthday} />
+            <BirthdayInput onDateChange={setBirthday} error={birthdayError} />
             <PlatformSelector platformChangeHandler={setPlatform} />
           </div>
-          <FormButton type="submit" title="save changes" styles="mt-10" />
+          <FormButton type="submit" title="save changes" className="mt-10" />
         </form>
       </div>
     </Fragment>

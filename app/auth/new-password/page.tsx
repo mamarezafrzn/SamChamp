@@ -1,4 +1,6 @@
-import { FC } from "react";
+"use client";
+
+import { FC, useState } from "react";
 import Image from "next/image";
 
 import FormButton from "@/components/form/form-button";
@@ -6,7 +8,11 @@ import FormInput from "@/components/form/form-input";
 
 import frameImg from "../../../public/images/new-pass-frame.svg";
 
+// TODO(step 11): submit to the reset-password endpoint once it exists.
 const NewPassword: FC = () => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   return (
     <div className="w-full min-h-screen relative">
       <div className="absolute bottom-0 w-full max-h-full overflow-y-auto">
@@ -22,13 +28,17 @@ const NewPassword: FC = () => {
               label="Password"
               placeholder="Strong#Pass1"
               type="password"
+              value={password}
+              onChange={setPassword}
             />
             <FormInput
               label="Confirm Password"
               placeholder="Re-type your password"
               type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
             />
-            <FormButton title="Continue" styles="my-2" />
+            <FormButton title="Continue" className="my-2" />
           </form>
         </div>
       </div>

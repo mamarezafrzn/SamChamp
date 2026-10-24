@@ -36,13 +36,6 @@ const Login: FC = () => {
     router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
   }
 
-  const emailChangeHandler = (value: string) => {
-    setEmail(value);
-  };
-  const passwordChangeHandler = (value: string) => {
-    setPassword(value);
-  };
-
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newErrors = {
@@ -70,14 +63,16 @@ const Login: FC = () => {
               label="E-mail"
               placeholder="name@example.com"
               type="text"
-              sendValue={emailChangeHandler}
+              value={email}
+              onChange={setEmail}
               error={errors.email}
             />
             <FormInput
               label="Password"
               placeholder="Strong#Pass1"
               type="password"
-              sendValue={passwordChangeHandler}
+              value={password}
+              onChange={setPassword}
               error={errors.password}
             />
             <p className="text-right text-white-ash font-normal text-sm">
@@ -86,7 +81,7 @@ const Login: FC = () => {
                 click here
               </Link>
             </p>
-            <FormButton type="submit" title="Login" styles="my-2" />
+            <FormButton type="submit" title="Login" className="my-2" />
           </form>
           <AuthPlatforms />
           <p className="text-center text-white-ash font-normal text-sm">
