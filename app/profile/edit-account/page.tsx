@@ -15,7 +15,7 @@ import { validateBirthday } from "@/utils/validation";
 
 import profileImg from "../../../public/images/Brentford.svg";
 import editImg from "../../../public/images/Edit.svg";
-import AvatarSelectModal from "./components/avatarSelect_modal";
+import AvatarSelectModal from "./components/avatar-select-modal";
 import PlatformSelector from "./components/platform-selector";
 
 interface Avatar {
