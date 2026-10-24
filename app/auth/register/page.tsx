@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, SubmitEvent, useState } from "react";
+import { FC, SubmitEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,11 +12,15 @@ import FormInput from "@/components/form/form-input";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { register } from "@/store/slices/auth/authActions";
+import { clearAuthError } from "@/store/slices/auth/authSlice";
 
+import { getFormErrors } from "@/lib/api-error";
 import { validateEmail, validatePassword } from "@/utils/validation";
 
 import frameImg from "../../../public/images/register-frame.svg";
 import AuthPlatforms from "../components/auth-platforms";
+
+const REGISTER_FIELDS = ["email", "password", "password_confirmation"] as const;
 
 const Register: FC = () => {
   const dispatch = useAppDispatch();
@@ -32,14 +36,22 @@ const Register: FC = () => {
     confirmPassword: "",
   });
 
+  const { user, loading, error } = useAppSelector((state) => state.auth);
+  const serverErrors = getFormErrors(error, REGISTER_FIELDS);
+
   // A logged-in user has nothing to do here, so send them to their profile.
-  const { user } = useAppSelector((state) => state.auth);
-  if (user) {
-    router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
-  }
+  useEffect(() => {
+    if (user) router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
+  }, [user, router]);
+
+  // Don't greet the user with an error from an earlier visit or the login page.
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(clearAuthError());
     const newErrors = {
       email: validateEmail(email),
       password: validatePassword(password),
@@ -66,25 +78,31 @@ const Register: FC = () => {
               label="E-mail"
               placeholder="name@example.com"
               type="text"
+              autoComplete="email"
               value={email}
               onChange={setEmail}
-              error={errors.email}
+              error={errors.email || serverErrors.fieldErrors.email}
             />
             <FormInput
               label="Password"
               placeholder="At least 8 characters"
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={setPassword}
-              error={errors.password}
+              error={errors.password || serverErrors.fieldErrors.password}
             />
             <FormInput
               label="Confirm Password"
               placeholder="Re-type your password"
               type="password"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={setConfirmPassword}
-              error={errors.confirmPassword}
+              error={
+                errors.confirmPassword ||
+                serverErrors.fieldErrors.password_confirmation
+              }
             />
             <label
               htmlFor="terms"
@@ -96,7 +114,17 @@ const Register: FC = () => {
                 terms
               </Link>
             </label>
-            <FormButton type="submit" title="Register" className="my-2" />
+            {serverErrors.formError && (
+              <p role="alert" className="text-red-error text-sm">
+                {serverErrors.formError}
+              </p>
+            )}
+            <FormButton
+              type="submit"
+              title="Register"
+              disabled={loading}
+              className="my-2"
+            />
           </form>
           <AuthPlatforms />
           <p className="text-center text-white-ash font-normal text-sm">

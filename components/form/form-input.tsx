@@ -1,6 +1,11 @@
 "use client";
 
-import { FC, HTMLInputTypeAttribute, useState } from "react";
+import {
+  FC,
+  HTMLInputAutoCompleteAttribute,
+  HTMLInputTypeAttribute,
+  useState,
+} from "react";
 import Image from "next/image";
 
 import hideImg from "../../public/images/hide.svg";
@@ -12,6 +17,7 @@ interface FormInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
+  autoComplete?: HTMLInputAutoCompleteAttribute;
   /** Maximum length; also shows a character counter. */
   count?: number;
   error?: string;
@@ -23,6 +29,7 @@ const FormInput: FC<FormInputProps> = ({
   onChange,
   placeholder,
   type = "text",
+  autoComplete,
   count,
   error,
 }) => {
@@ -39,6 +46,7 @@ const FormInput: FC<FormInputProps> = ({
       <input
         type={isPasswordType && isPasswordVisible ? "text" : type}
         placeholder={placeholder}
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         maxLength={count}

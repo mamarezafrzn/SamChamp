@@ -28,7 +28,11 @@ const authThunks = [login, register, loginWithPlatform] as const;
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    clearAuthError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loggedOut, () => initialState)
@@ -47,4 +51,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

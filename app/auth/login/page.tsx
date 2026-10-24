@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, SubmitEvent, useState } from "react";
+import { FC, SubmitEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,11 +12,15 @@ import FormInput from "@/components/form/form-input";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { login } from "@/store/slices/auth/authActions";
+import { clearAuthError } from "@/store/slices/auth/authSlice";
 
+import { getFormErrors } from "@/lib/api-error";
 import { validateEmail, validatePassword } from "@/utils/validation";
 
 import frameImg from "../../../public/images/login-frame.svg";
 import AuthPlatforms from "../components/auth-platforms";
+
+const LOGIN_FIELDS = ["email", "password"] as const;
 
 const Login: FC = () => {
   const dispatch = useAppDispatch();
@@ -30,14 +34,22 @@ const Login: FC = () => {
     password: "",
   });
 
+  const { user, loading, error } = useAppSelector((state) => state.auth);
+  const serverErrors = getFormErrors(error, LOGIN_FIELDS);
+
   // A logged-in user has nothing to do here, so send them to their profile.
-  const { user } = useAppSelector((state) => state.auth);
-  if (user) {
-    router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
-  }
+  useEffect(() => {
+    if (user) router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
+  }, [user, router]);
+
+  // Don't greet the user with an error from an earlier visit or the register page.
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(clearAuthError());
     const newErrors = {
       email: validateEmail(email),
       password: validatePassword(password),
@@ -63,30 +75,45 @@ const Login: FC = () => {
               label="E-mail"
               placeholder="name@example.com"
               type="text"
+              autoComplete="email"
               value={email}
               onChange={setEmail}
-              error={errors.email}
+              error={errors.email || serverErrors.fieldErrors.email}
             />
             <FormInput
               label="Password"
               placeholder="Strong#Pass1"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={setPassword}
-              error={errors.password}
+              error={errors.password || serverErrors.fieldErrors.password}
             />
             <p className="text-right text-white-ash font-normal text-sm">
               Forgot your password?{" "}
-              <Link href="/auth/new-password" className="text-yellow-sun">
+              <Link
+                href={APP_ROUTES.AUTH.NEW_PASSWORD}
+                className="text-yellow-sun"
+              >
                 click here
               </Link>
             </p>
-            <FormButton type="submit" title="Login" className="my-2" />
+            {serverErrors.formError && (
+              <p role="alert" className="text-red-error text-sm">
+                {serverErrors.formError}
+              </p>
+            )}
+            <FormButton
+              type="submit"
+              title="Login"
+              disabled={loading}
+              className="my-2"
+            />
           </form>
           <AuthPlatforms />
           <p className="text-center text-white-ash font-normal text-sm">
             Not a member?{" "}
-            <Link href="/auth/register" className="text-yellow-sun">
+            <Link href={APP_ROUTES.AUTH.REGISTER} className="text-yellow-sun">
               Register now
             </Link>
           </p>
