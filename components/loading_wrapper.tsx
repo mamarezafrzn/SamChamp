@@ -1,31 +1,19 @@
-// components/LoadingWrapper.tsx
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import logoImg from "../public/images/logo.svg";
+import { ReactNode, useEffect, useState } from "react";
 
-export default function LoadingWrapper({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import SplashScreen from "./splash-screen";
+
+const SPLASH_DURATION_MS = 100;
+
+/** Shows the splash screen briefly on first load, then renders the app. */
+export default function LoadingWrapper({ children }: { children: ReactNode }) {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Enforce a 2-second loading screen
-    const timer = setTimeout(() => setShowLoading(false), 100);
-
-    return () => clearTimeout(timer); // Cleanup timer on unmount
+    const timer = setTimeout(() => setShowLoading(false), SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (showLoading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-black-rich">
-        <Image alt="Logo Image" src={logoImg} />
-      </div>
-    );
-  }
-
-  return <>{children}</>;
+  return showLoading ? <SplashScreen /> : <>{children}</>;
 }
