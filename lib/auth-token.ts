@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-const AUTH_TOKEN_COOKIE = "authToken";
+export const AUTH_TOKEN_COOKIE = "authToken";
 
 export const getAuthToken = () => Cookies.get(AUTH_TOKEN_COOKIE);
 

@@ -2,6 +2,7 @@ import { createAction } from "@reduxjs/toolkit";
 import type { AxiosResponse } from "axios";
 
 import { API_ROUTES } from "@/app/constants/apiRoutes";
+import { APP_ROUTES } from "@/app/constants/appRoutes";
 
 import type { AppThunk } from "@/store";
 import { createAppAsyncThunk } from "@/store/createAppAsyncThunk";
@@ -72,7 +73,10 @@ export const loginWithPlatform = createAppAsyncThunk(
 /** Dispatched after the session is cleared; every slice resets on it. */
 export const loggedOut = createAction("auth/loggedOut");
 
+/** Ends the session and leaves the app for the logged-out entry page. */
 export const logout = (): AppThunk => (dispatch) => {
   removeAuthToken();
   dispatch(loggedOut());
+  // TODO: go to the landing page once it exists.
+  window.location.assign(APP_ROUTES.AUTH.LOGIN);
 };

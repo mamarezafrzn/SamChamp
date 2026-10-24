@@ -37,7 +37,7 @@ const Login: FC = () => {
   const { user, loading, error } = useAppSelector((state) => state.auth);
   const serverErrors = getFormErrors(error, LOGIN_FIELDS);
 
-  // A logged-in user has nothing to do here, so send them to their profile.
+  // Continue to the profile once login succeeds (middleware handles later visits).
   useEffect(() => {
     if (user) router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
   }, [user, router]);
