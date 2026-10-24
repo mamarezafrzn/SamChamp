@@ -1,39 +1,39 @@
 "use client";
-import React, { FC, useState } from "react";
-import Image from "@/node_modules/next/image";
-import visibilityImg from "../../public/images/visibility.svg";
+
+import { ChangeEvent, FC, HTMLInputTypeAttribute, useState } from "react";
+import Image from "next/image";
+
 import hideImg from "../../public/images/hide.svg";
+import visibilityImg from "../../public/images/visibility.svg";
 
 interface FormInputProps {
   label?: string;
   placeholder?: string;
-  type?: string; // Add type as a prop
+  type?: HTMLInputTypeAttribute;
+  /** Maximum length; also shows a character counter. */
   count?: number;
-  sendValue: (value: string) => void;
+  sendValue?: (value: string) => void;
   error?: string;
 }
 
 const FormInput: FC<FormInputProps> = ({
   label = "Input",
   placeholder = "Your data",
-  type = "type", // Default to "text" if not provided
-  count = null,
+  type = "text",
+  count,
   error,
   sendValue,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  // const [error, setError] = useState(false);
-  const [errorText, setErrorText] = useState("Error text");
-  const [inputCount, setInputCount] = useState(count);
   const [inputData, setInputData] = useState("");
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prevState) => !prevState);
   };
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputData(e.target.value);
-    sendValue(e.target.value)
+    sendValue?.(e.target.value);
   };
 
   const isPasswordType = type === "password";
@@ -45,7 +45,7 @@ const FormInput: FC<FormInputProps> = ({
         placeholder={placeholder}
         value={inputData}
         onChange={onInputChange}
-        maxLength={count || undefined}
+        maxLength={count}
         className={`${
           error && "border-red-error"
         } w-full h-[3.5rem] bg-grey-smoke border border-grey-silver rounded-2xl px-5 py-4`}
@@ -64,9 +64,9 @@ const FormInput: FC<FormInputProps> = ({
           } right-4 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none`}
         >
           {isPasswordVisible ? (
-            <Image src={visibilityImg} alt="show password" />
+            <Image src={visibilityImg} alt="Hide password" />
           ) : (
-            <Image src={hideImg} alt="show password" />
+            <Image src={hideImg} alt="Show password" />
           )}
         </button>
       )}

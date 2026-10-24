@@ -1,95 +1,97 @@
-import Image from "next/image";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
+import Image, { type StaticImageData } from "next/image";
+
+import { API_ROUTES } from "@/app/constants/apiRoutes";
+
+import { api } from "@/lib/api";
+import { toApiError } from "@/lib/api-error";
+import type { ApiResponse } from "@/types/api";
+import type { Team, TeamsByLeague } from "@/types/profile";
+
 import arrowLeft from "/public/images/Arrow-Left.svg";
 import searchImg from "/public/images/Search.svg";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { API_ROUTES } from "@/app/constants/apiRoutes";
-import Cookies from "js-cookie";
 
-interface Team {
-  id: number;
-  title: string;
-  flag: string;
+interface AvatarSelectModalProps {
+  hideModal: () => void;
+  onChangeAvatar: (flag: string, id: number) => void;
+  /** Currently selected avatar: a team flag URL or the bundled default image. */
+  avatar: string | StaticImageData;
 }
 
-// Define the shape of the API response
-interface ApiResponse {
-  data: {
-    [key: string]: string; // Adjust based on your API response structure
-  };
-}
+const MAX_LEAGUES_SHOWN = 5;
 
-// Define the shape of the error response
-interface ErrorResponse {
-  response?: {
-    data?: {
-      data?: {
-        [key: string]: string; // Adjust based on your API error structure
-      };
-    };
-  };
-}
-
-const AvatarSelectModal: FC = ({ hideModal, onChangeAvatar, avatar }) => {
-  const [teams, setTeams] = useState<{ [key: string]: Team[] } | null>(null);
+const AvatarSelectModal: FC<AvatarSelectModalProps> = ({
+  hideModal,
+  onChangeAvatar,
+  avatar,
+}) => {
+  const [teams, setTeams] = useState<TeamsByLeague | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [avatarFlag, setAvatarFlag] = useState(avatar);
   const [searchInput, setSearchInput] = useState("");
-console.log(avatar)
-  async function fetchTeams() {
-    const token = Cookies.get("authToken");
-    try {
-      const response: AxiosResponse<ApiResponse> = await axios.get(
-        `${API_ROUTES.MAIN}${API_ROUTES.USER.TEAMS}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setTeams(response?.data?.data?.leagues);
-      console.log(response?.data?.data?.leagues);
-    } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>;
-
-      if (axiosError.response?.data?.data) {
-        const errorKeys = Object.keys(axiosError.response.data.data);
-
-        errorKeys.forEach((key) => {
-          console.log(`${key}: ${axiosError.response?.data?.data[key]}`);
-        });
-      } else {
-        console.log("Authentication failed. No error data found.");
-      }
-    }
-  }
 
   useEffect(() => {
-    fetchTeams();
+    api
+      .get<ApiResponse<{ leagues: TeamsByLeague }>>(API_ROUTES.USER.TEAMS)
+      .then(({ data }) => setTeams(data.data.leagues))
+      .catch((error) => setError(toApiError(error).message));
   }, []);
 
-  const avatarClickHandler = (flag, id) => {
-    setAvatarFlag(flag);
-    onChangeAvatar(flag,id);
+  const avatarClickHandler = (team: Team) => {
+    setAvatarFlag(team.flag);
+    onChangeAvatar(team.flag, team.id);
   };
 
-  const onSearchChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const onSearchChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
   };
 
-  const filteredTeams = searchInput
+  // Keep only matching teams, and drop leagues left with none.
+  const filteredTeams: TeamsByLeague | null = searchInput
     ? Object.fromEntries(
-        Object.entries(teams || {})
-          .map(([league, teamList]) => [
+        Object.entries(teams ?? {})
+          .map(([league, teamList]): [string, Team[]] => [
             league,
             teamList.filter((team) =>
-              team.title.toLowerCase().includes(searchInput.toLowerCase())
+              team.title.toLowerCase().includes(searchInput.toLowerCase()),
             ),
           ])
-          .filter(([_, filtered]) => filtered.length > 0)
+          .filter(([, filtered]) => filtered.length > 0),
       )
     : teams;
+
+  const renderTeams = () => {
+    if (error) return <p className="text-red-error">{error}</p>;
+    if (!filteredTeams) return <p>Loading...</p>;
+    if (Object.keys(filteredTeams).length === 0) {
+      return <p className="text-white">No results found</p>;
+    }
+
+    return Object.entries(filteredTeams)
+      .slice(0, MAX_LEAGUES_SHOWN)
+      .map(([league, teamList]) => (
+        <div key={league} className="mb-6">
+          <h2 className="mb-[1.2rem] text-xl font-medium text-white">
+            {league}
+          </h2>
+          <ul className="flex flex-row flex-wrap gap-[1.2rem]">
+            {teamList.map((team) => (
+              <li
+                key={team.id}
+                onClick={() => avatarClickHandler(team)}
+                className="ml-4 cursor-pointer"
+              >
+                <img
+                  src={team.flag}
+                  alt={team.title}
+                  className="w-[65px] h-[65px]"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ));
+  };
 
   return (
     <div className="absolute top-0 left-0 w-screen min-h-screen z-10 bg-black-rich">
@@ -103,16 +105,14 @@ console.log(avatar)
             <h1>back</h1>
           </button>
         </div>
-        <div className="">
-          <div className="relative w-fit m-auto mb-10">
-            <Image
-              src={avatarFlag}
-              alt="Profile Picture"
-              width={100}
-              height={100}
-              className="w-[100px] h-[100px] object-contain"
-            />
-          </div>
+        <div className="relative w-fit m-auto mb-10">
+          <Image
+            src={avatarFlag}
+            alt="Profile Picture"
+            width={100}
+            height={100}
+            className="w-[100px] h-[100px] object-contain"
+          />
         </div>
         <div className="relative">
           <span className="absolute left-[1rem] top-[.85rem]">
@@ -126,40 +126,7 @@ console.log(avatar)
             className="w-full h-[3rem] p-[1rem] rounded-2xl bg-grey-dark pl-[3rem]"
           />
         </div>
-        <div>
-          <div className="container mx-auto p-4">
-            {!filteredTeams ? (
-              <p>Loading...</p>
-            ) : Object.keys(filteredTeams).length > 0 ? (
-              Object.entries(filteredTeams)
-                .slice(0, 5) // Show max 5 leagues
-                .map(([league, teamList]) => (
-                  <div key={league} className="mb-6">
-                    <h2 className="mb-[1.2rem] text-xl font-medium text-white">
-                      {league}
-                    </h2>
-                    <ul className="flex flex-row flex-wrap gap-[1.2rem]">
-                      {teamList.map((team) => (
-                        <li
-                          key={team.id}
-                          onClick={() => avatarClickHandler(team.flag, team.id)}
-                          className="ml-4 cursor-pointer"
-                        >
-                          <img
-                            src={team.flag}
-                            alt={team.title}
-                            className="w-[65px] h-[65px]"
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
-            ) : (
-              <p className="text-white">No results found</p>
-            )}
-          </div>
-        </div>
+        <div className="container mx-auto p-4">{renderTeams()}</div>
       </div>
     </div>
   );

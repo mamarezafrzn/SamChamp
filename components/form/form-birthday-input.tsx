@@ -1,30 +1,41 @@
 "use client";
+
 import { FC, useEffect, useState } from "react";
 
-interface BirthdayInputProps {
-  onDateChange: (date: string) => void; // Function to send date to parent
+interface DateParts {
+  day: string;
+  month: string;
+  year: string;
 }
 
-const BirthdayInput: React.FC<BirthdayInputProps> = ({ onDateChange }) => {
-  const [error, setError] = useState(false);
-  const [errorText, setErrorText] = useState("Error text");
-  const [dateInput, setDateInput] = useState({ day: "", month: "", year: "" });
+interface BirthdayInputProps {
+  /** Receives the date as `YYYY-MM-DD`. */
+  onDateChange: (date: string) => void;
+  error?: string;
+}
 
+const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
+  const [dateInput, setDateInput] = useState<DateParts>({
+    day: "",
+    month: "",
+    year: "",
+  });
 
-  const inputChangeHandler = (field: string, value: string) => {
+  const inputChangeHandler = (field: keyof DateParts, value: string) => {
     setDateInput((prevState) => ({
       ...prevState,
       [field]: value,
-  }));
+    }));
   };
-      // Debounce effect to send updates to parent after typing settles
-      useEffect(() => {
-        const timeout = setTimeout(() => {
-            onDateChange(`${dateInput.year}-${dateInput.month}-${dateInput.day}`);
-        }, 10); // Delay of 300ms (adjust as needed)
 
-        return () => clearTimeout(timeout); // Cleanup the timeout on unmount or new input
-    }, [dateInput, onDateChange]);
+  // Send the combined date to the parent once typing settles.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onDateChange(`${dateInput.year}-${dateInput.month}-${dateInput.day}`);
+    }, 10);
+
+    return () => clearTimeout(timeout);
+  }, [dateInput, onDateChange]);
 
   return (
     <div className="flex flex-col text-white text-sm font-normal gap-1">
@@ -58,7 +69,7 @@ const BirthdayInput: React.FC<BirthdayInputProps> = ({ onDateChange }) => {
           className="w-16 text-center bg-transparent text-gray-200 placeholder-gray-500 outline-none"
         />
       </div>
-      {error && errorText && <p className="text-red-error">{errorText}</p>}
+      {error && <p className="text-red-error">{error}</p>}
     </div>
   );
 };

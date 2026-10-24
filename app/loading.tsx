@@ -20,7 +20,7 @@ export default function Loading() {
 
   return (
     <div className="bg-black-rich w-full h-full">
-        <p>Count to 3</p>
+      <p>Count to 3</p>
     </div>
   );
 }

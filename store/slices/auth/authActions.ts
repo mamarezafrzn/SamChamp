@@ -1,116 +1,78 @@
+import { createAction } from "@reduxjs/toolkit";
+import type { AxiosResponse } from "axios";
+
 import { API_ROUTES } from "@/app/constants/apiRoutes";
-import { APP_ROUTES } from "@/app/constants/appRoutes";
-import axios, { AxiosError, AxiosResponse } from "@/node_modules/axios/index";
-import { RootState } from "@/store";
-import { ThunkAction } from "@reduxjs/toolkit";
-import Cookies from "js-cookie";
-import { authError, authSuccess } from "./authSlice";
 
-interface UserData {
-  email: string;
-  password: string;
-  password_confirmation?: string;
-}
-// Define the shape of the API response
-interface ApiResponse {
-  data: {
-    [key: string]: string; // Adjust based on your API response structure
-  };
+import type { AppThunk } from "@/store";
+import { createAppAsyncThunk } from "@/store/createAppAsyncThunk";
+
+import { api } from "@/lib/api";
+import { toApiError } from "@/lib/api-error";
+import { removeAuthToken, setAuthToken } from "@/lib/auth-token";
+import type { ApiResponse } from "@/types/api";
+import type {
+  AuthData,
+  LoginCredentials,
+  RegisterCredentials,
+} from "@/types/auth";
+
+type AuthResponse = ApiResponse<AuthData>;
+
+type PlatformAuthRoute =
+  | typeof API_ROUTES.AUTH.GOOGLE
+  | typeof API_ROUTES.AUTH.FACEBOOK
+  | typeof API_ROUTES.AUTH.APPLE;
+
+/** Waits for an auth request, saves the returned token and returns the response body. */
+async function authenticate(request: Promise<AxiosResponse<AuthResponse>>) {
+  const { data } = await request;
+  const token = data.data.token?.access_token;
+  if (token) setAuthToken(token);
+  return data;
 }
 
-// Define the shape of the error response
-interface ErrorResponse {
-  response?: {
-    data?: {
-      data?: {
-        [key: string]: string; // Adjust based on your API error structure
-      };
-    };
-  };
-}
-
-export const auth =
-  (userData: UserData, apiRoute: string) => async (dispatch) => {
+export const login = createAppAsyncThunk(
+  "auth/login",
+  async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response: AxiosResponse<ApiResponse> = await axios.post(
-        `${API_ROUTES.MAIN}${apiRoute}`,
-        userData
+      return await authenticate(
+        api.post<AuthResponse>(API_ROUTES.AUTH.LOGIN, credentials),
       );
-      Cookies.set("authToken", response.data.data.token?.access_token);
-      dispatch(authSuccess(response.data));
     } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>;
-      dispatch(authError(axiosError));
-      // Log the error response data keys
-      if (axiosError.response?.data?.data) {
-        const errorKeys = Object.keys(axiosError.response.data.data);
-
-        // Optionally, log the key-value pairs
-        errorKeys.forEach((key) => {
-          console.log(`${key}: ${axiosError.response?.data?.data[key]}`);
-        });
-      } else {
-        console.log("Authentication failed. No error data found.");
-      }
+      return rejectWithValue(toApiError(error));
     }
-  };
+  },
+);
 
-export const authPlatforms = (apiRoute: string) => async (dispatch) => {
-
-  try {
-    const response: AxiosResponse<ApiResponse> = await axios.get(
-      `${API_ROUTES.MAIN}${apiRoute}`
-    );
-    Cookies.set("authToken", response.data.data.token?.access_token);
-    dispatch(authSuccess(response.data));
-    console.log(response)
-  } catch (error) {
-    const axiosError = error as AxiosError<ErrorResponse>;
-    dispatch(authError(axiosError));
-
-    if (axiosError.response?.data?.data) {
-      const errorKeys = Object.keys(axiosError.response.data.data);
-
-
-      errorKeys.forEach((key) => {
-        console.log(`${key}: ${axiosError.response?.data?.data[key]}`);
-      });
-    } else {
-      console.log("Authentication failed. No error data found.");
+export const register = createAppAsyncThunk(
+  "auth/register",
+  async (credentials: RegisterCredentials, { rejectWithValue }) => {
+    try {
+      return await authenticate(
+        api.post<AuthResponse>(API_ROUTES.AUTH.REGISTER, credentials),
+      );
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
     }
-  }
+  },
+);
+
+/** Logs in through a social platform (Google, Facebook or Apple). */
+export const loginWithPlatform = createAppAsyncThunk(
+  "auth/loginWithPlatform",
+  async (route: PlatformAuthRoute, { rejectWithValue }) => {
+    try {
+      return await authenticate(api.get<AuthResponse>(route));
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
+    }
+  },
+);
+
+/** Dispatched after the session is cleared; every slice resets on it. */
+export const loggedOut = createAction("auth/loggedOut");
+
+export const logout = (): AppThunk => (dispatch) => {
+  removeAuthToken();
+  dispatch(loggedOut());
 };
-
-// export const authPlatforms = (
-//   apiRoute: string
-// ): ThunkAction<void, RootState, unknown, any> => async (dispatch) => {
-
-//   try {
-//     const response: AxiosResponse<ApiResponse> = await axios.get(
-//       `${API_ROUTES.MAIN}${apiRoute}`,
-//       {
-//         maxRedirects: 0,  // Prevent Axios from following redirects
-//         validateStatus: (status) => status === 302 || status < 400,  // Allow 302 status
-//       }
-//     );
-  
-
-//     if (response.status === 302 && response.headers.location) {
-//       // Redirect to the external login URL
-//       // window.location.href = response.headers.location;
-//     } else {
-//       // Handle successful authentication response
-//       const token = response.data.data.token?.access_token;
-//       if (token) {
-//         Cookies.set("authToken", token, { secure: true, sameSite: "strict" });
-//       }
-//       dispatch(authSuccess(response.data));
-//     }
-//   } catch (error) {
-//     const axiosError = error as AxiosError<ErrorResponse>;
-//     dispatch(authError(axiosError));
-  
-//     console.error("Authentication failed:", axiosError.message);
-//   }
-  
-// };

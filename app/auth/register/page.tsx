@@ -1,22 +1,25 @@
 "use client";
-import { FC, useState } from "react";
-import Link from "@/node_modules/next/link";
-import Image from "@/node_modules/next/image";
-import FormInput from "@/components/form/form-input";
-import FormButton from "@/components/form/form-button";
-import AuthPlatforms from "../components/auth-platforms";
-import frameImg from "../../../public/images/register-frame.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { auth } from "@/store/slices/auth/authActions";
-import { validateEmail, validatePassword } from "@/utils/validation";
-import { RootState } from "@/store";
+
+import { FC, SubmitEvent, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+
 import { APP_ROUTES } from "@/app/constants/appRoutes";
-import { API_ROUTES } from "@/app/constants/apiRoutes";
+
+import FormButton from "@/components/form/form-button";
+import FormInput from "@/components/form/form-input";
+
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { register } from "@/store/slices/auth/authActions";
+
+import { validateEmail, validatePassword } from "@/utils/validation";
+
+import frameImg from "../../../public/images/register-frame.svg";
+import AuthPlatforms from "../components/auth-platforms";
 
 const Register: FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const router = useRouter();
 
@@ -29,8 +32,8 @@ const Register: FC = () => {
     confirmPassword: "",
   });
 
-    //if the user exists move to profile page
-  const { user } = useSelector((state: RootState) => state.auth);
+  // A logged-in user has nothing to do here, so send them to their profile.
+  const { user } = useAppSelector((state) => state.auth);
   if (user) {
     router.push(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
   }
@@ -45,23 +48,20 @@ const Register: FC = () => {
     setConfirmPassword(value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newErrors = {
       email: validateEmail(email),
       password: validatePassword(password),
       confirmPassword:
-        confirmPassword != password ? "password does not match" : "",
+        confirmPassword !== password ? "password does not match" : "",
     };
     setErrors(newErrors);
     const isValid = Object.values(newErrors).every((error) => !error);
     if (isValid) {
-      const formData = {
-        email,
-        password,
-        password_confirmation: confirmPassword,
-      };
-      dispatch(auth(formData, API_ROUTES.AUTH.REGISTER));
+      dispatch(
+        register({ email, password, password_confirmation: confirmPassword }),
+      );
     }
   };
 
@@ -108,7 +108,7 @@ const Register: FC = () => {
           <AuthPlatforms />
           <p className="text-center text-white-ash font-normal text-sm">
             Already a member?{" "}
-            <Link href="/auth/login" className="text-yellow-sun">
+            <Link href={APP_ROUTES.AUTH.LOGIN} className="text-yellow-sun">
               Login
             </Link>
           </p>

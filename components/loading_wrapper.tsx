@@ -1,7 +1,7 @@
 // components/LoadingWrapper.tsx
 "use client";
 
-import Image from "@/node_modules/next/image";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import logoImg from "../public/images/logo.svg";
 
