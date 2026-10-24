@@ -17,8 +17,9 @@ import { clearAuthError } from "@/store/slices/auth/authSlice";
 import { getFormErrors } from "@/lib/api-error";
 import { validateEmail, validatePassword } from "@/utils/validation";
 
-import frameImg from "../../../public/images/login-frame.svg";
 import AuthPlatforms from "../components/auth-platforms";
+
+import frameImg from "@/public/images/login-frame.svg";
 
 const LOGIN_FIELDS = ["email", "password"] as const;
 

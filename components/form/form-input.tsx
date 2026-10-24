@@ -8,8 +8,8 @@ import {
 } from "react";
 import Image from "next/image";
 
-import hideImg from "../../public/images/hide.svg";
-import visibilityImg from "../../public/images/visibility.svg";
+import hideImg from "@/public/images/hide.svg";
+import visibilityImg from "@/public/images/visibility.svg";
 
 interface FormInputProps {
   label: string;

@@ -13,10 +13,11 @@ import { updateUserProfile } from "@/store/slices/profile/profileActions";
 import type { Platform } from "@/types/profile";
 import { validateBirthday } from "@/utils/validation";
 
-import profileImg from "../../../public/images/Brentford.svg";
-import editImg from "../../../public/images/Edit.svg";
 import AvatarSelectModal from "./components/avatar-select-modal";
 import PlatformSelector from "./components/platform-selector";
+
+import profileImg from "@/public/images/Brentford.svg";
+import editImg from "@/public/images/Edit.svg";
 
 interface Avatar {
   flag: string | StaticImageData;
@@ -33,7 +34,7 @@ const EditAccount: FC = () => {
   const [avatar, setAvatar] = useState<Avatar>(DEFAULT_AVATAR);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
-  // TODO(step 9): include in the request once the API field name is confirmed.
+  // TODO: include in the request once the API field name is confirmed.
   const [userId, setUserId] = useState("");
   const [birthday, setBirthday] = useState("");
   const [birthdayError, setBirthdayError] = useState("");

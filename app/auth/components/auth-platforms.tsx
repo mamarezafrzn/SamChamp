@@ -4,16 +4,17 @@ import Image from "next/image";
 import { useGoogleLogin } from "@react-oauth/google";
 
 import { API_ROUTES } from "@/app/constants/apiRoutes";
+import { APP_ROUTES } from "@/app/constants/appRoutes";
 
 import { API_BASE_URL } from "@/lib/api";
 
-import appleImg from "../../../public/images/apple.svg";
-import facebookImg from "../../../public/images/facebook.svg";
-import googleImg from "../../../public/images/google.svg";
+import appleImg from "@/public/images/apple.svg";
+import facebookImg from "@/public/images/facebook.svg";
+import googleImg from "@/public/images/google.svg";
 
 /** Social login buttons shown under the login and register forms. */
 const AuthPlatforms: FC = () => {
-  // TODO(step 7): send Google's token to the backend and only redirect on success.
+  // TODO: send Google's token to the backend and only redirect when it accepts it.
   const login = useGoogleLogin({
     onSuccess: () => {
       fetch(`${API_BASE_URL}${API_ROUTES.AUTH.GOOGLE}`, {
@@ -22,7 +23,7 @@ const AuthPlatforms: FC = () => {
       })
         .then((res) => res.json())
         .then(() => {
-          window.location.href = "/profile/edit-account";
+          window.location.href = APP_ROUTES.PROFILE.EDIT_ACCOUNT;
         })
         .catch((error) => console.error("Google login failed:", error));
     },
@@ -36,7 +37,7 @@ const AuthPlatforms: FC = () => {
     <div className="flex flex-col gap-6 my-4">
       <div className="flex flex-row gap-4 items-center">
         <div className="w-full h-px border-b border-grey-silver"></div>
-        <p className="w-content whitespace-nowrap text-border-grey-silver text-grey-silver font-normal text-sm font-roboto">
+        <p className="whitespace-nowrap text-grey-silver font-normal text-sm font-roboto">
           Or continue with
         </p>
         <div className="w-full h-full border-b border-grey-silver"></div>

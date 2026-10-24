@@ -7,9 +7,9 @@ import FormInput from "@/components/form/form-input";
 
 import type { Platform } from "@/types/profile";
 
-import pcIcon from "../../../../public/images/pc-icon.svg";
-import playstationIcon from "../../../../public/images/playstation-icon.svg";
-import xboxIcon from "../../../../public/images/xbox-icon.svg";
+import pcIcon from "@/public/images/pc-icon.svg";
+import playstationIcon from "@/public/images/playstation-icon.svg";
+import xboxIcon from "@/public/images/xbox-icon.svg";
 
 interface PlatformSelectorProps {
   platformChangeHandler: (platform: Platform) => void;

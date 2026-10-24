@@ -6,9 +6,9 @@ import Image from "next/image";
 import FormButton from "@/components/form/form-button";
 import FormInput from "@/components/form/form-input";
 
-import frameImg from "../../../public/images/new-pass-frame.svg";
+import frameImg from "@/public/images/new-pass-frame.svg";
 
-// TODO(step 11): submit to the reset-password endpoint once it exists.
+// TODO: submit to the reset-password endpoint once it exists.
 const NewPassword: FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

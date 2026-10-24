@@ -3,7 +3,7 @@ import { Roboto, Rubik } from "next/font/google";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import LoadingWrapper from "@/components/loading_wrapper";
+import LoadingWrapper from "@/components/loading-wrapper";
 
 import "./globals.css";
 
