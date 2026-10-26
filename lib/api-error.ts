@@ -5,10 +5,15 @@ import type { ApiError, ApiErrorBody } from "@/types/api";
 /** Converts anything thrown by a request into an `ApiError`. */
 export function toApiError(error: unknown): ApiError {
   if (isAxiosError<ApiErrorBody>(error)) {
-    return {
-      message: error.response?.data?.message ?? error.message,
-      fieldErrors: error.response?.data?.data ?? {},
-    };
+    const body = error.response?.data;
+    // The backend sends a list per field; show the first, like client-side validation does.
+    const fieldErrors = Object.fromEntries(
+      Object.entries(body?.errors ?? {}).map(([field, messages]) => [
+        field,
+        messages[0],
+      ]),
+    );
+    return { message: body?.message ?? error.message, fieldErrors };
   }
   return { message: "Something went wrong", fieldErrors: {} };
 }

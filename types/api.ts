@@ -4,10 +4,10 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-/** Body of a failed request; `data` maps field names to validation messages. */
+/** Body of a failed request; `errors` maps field names to validation messages. */
 export interface ApiErrorBody {
   message?: string;
-  data?: Record<string, string>;
+  errors?: Record<string, string[]>;
 }
 
 /** Normalized, serializable error that is safe to keep in Redux state. */

@@ -20,7 +20,7 @@ Requires **Node.js 18.18+** (20+ recommended) and npm.
 2. Create `.env.local` in the project root (it is git-ignored):
 
    ```bash
-   NEXT_PUBLIC_API_URL=https://samchamp.apachish.ir/
+   NEXT_PUBLIC_API_URL=https://sampchamp.apachish.ir/
    NEXT_PUBLIC_GOOGLE_CLIENT_ID=<Google OAuth client ID — ask the team>
    ```
 

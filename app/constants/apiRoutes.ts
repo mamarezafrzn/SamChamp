@@ -10,7 +10,7 @@ export const API_ROUTES = {
   USER: {
     PROFILE: {
       GET_PROFILE: "api/profile",
-      UPDATE_PROFILE: "api/update-profile",
+      UPDATE_PROFILE: "api/profile",
     },
     TEAMS: "api/teams/grouped-by-league",
   },

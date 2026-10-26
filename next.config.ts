@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "samchamp.apachish.ir",
+        hostname: "sampchamp.apachish.ir",
         pathname: "/logos/**",
       },
     ],
