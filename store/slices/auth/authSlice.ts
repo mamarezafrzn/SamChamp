@@ -6,13 +6,13 @@ import {
 } from "@reduxjs/toolkit";
 
 import { toApiError } from "@/lib/api-error";
-import type { ApiError, ApiResponse } from "@/types/api";
-import type { AuthData } from "@/types/auth";
+import type { ApiError } from "@/types/api";
+import type { User } from "@/types/auth";
 
 import { loggedOut, login, loginWithPlatform, register } from "./authActions";
 
 interface AuthState {
-  user: ApiResponse<AuthData> | null;
+  user: User | null;
   loading: boolean;
   error: ApiError | null;
 }

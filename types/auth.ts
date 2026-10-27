@@ -9,9 +9,23 @@ export interface RegisterCredentials extends LoginCredentials {
   password_confirmation: string;
 }
 
-/** `data` payload returned by a successful login or register. */
-export interface AuthData {
-  token?: {
-    access_token: string;
+/** The logged-in user, as returned by the login endpoint. */
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  profile: {
+    avatar: string | null;
+    bio: string;
+    meta: unknown;
+    extra_fields: unknown[];
   };
+  created_at: string;
+  updated_at: string;
+}
+
+/** Body of a successful login. */
+export interface AuthResponse {
+  user: User;
+  token: string;
 }

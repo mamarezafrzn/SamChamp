@@ -15,6 +15,8 @@ export function toApiError(error: unknown): ApiError {
     );
     return { message: body?.message ?? error.message, fieldErrors };
   }
+  // Not a request failure, so it's a bug in our code: keep it visible to developers.
+  console.error(error);
   return { message: "Something went wrong", fieldErrors: {} };
 }
 

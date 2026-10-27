@@ -1,16 +1,18 @@
 "use client";
 
-import { FC, Fragment, SubmitEvent, useState } from "react";
+import { FC, Fragment, SubmitEvent, useEffect, useState } from "react";
 import Image, { type StaticImageData } from "next/image";
 
 import BirthdayInput from "@/components/form/form-birthday-input";
 import FormButton from "@/components/form/form-button";
 import FormInput from "@/components/form/form-input";
 
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { updateUserProfile } from "@/store/slices/profile/profileActions";
+import { clearProfileError } from "@/store/slices/profile/profileSlice";
 
-import type { Platform } from "@/types/profile";
+import { getFormErrors } from "@/lib/api-error";
+import type { ExtraField, Platform } from "@/types/profile";
 import { validateBirthday } from "@/utils/validation";
 
 import AvatarSelectModal from "./components/avatar-select-modal";
@@ -21,11 +23,19 @@ import editImg from "@/public/images/Edit.svg";
 
 interface Avatar {
   flag: string | StaticImageData;
-  /** Team ID, sent to the API as `team`. */
+  /** Team ID. Not sent yet: the backend has no team field so far. */
   id: number;
 }
 
 const DEFAULT_AVATAR: Avatar = { flag: profileImg, id: 27 };
+
+const PROFILE_FIELDS = ["name", "phone"] as const;
+
+/** The backend has no columns for these, so they're stored as text extra fields. Empty ones are skipped. */
+const toExtraFields = (values: Record<string, string>): ExtraField[] =>
+  Object.entries(values)
+    .filter(([, value]) => value)
+    .map(([key, value]) => ({ id: null, key, type: "text", value }));
 
 const EditAccount: FC = () => {
   const dispatch = useAppDispatch();
@@ -34,7 +44,7 @@ const EditAccount: FC = () => {
   const [avatar, setAvatar] = useState<Avatar>(DEFAULT_AVATAR);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
-  // TODO: include in the request once the API field name is confirmed.
+  const [phone, setPhone] = useState("");
   const [userId, setUserId] = useState("");
   const [birthday, setBirthday] = useState("");
   const [birthdayError, setBirthdayError] = useState("");
@@ -42,6 +52,14 @@ const EditAccount: FC = () => {
     game_machine: "",
     game_id: "",
   });
+
+  const { loading, error } = useAppSelector((state) => state.profile);
+  const serverErrors = getFormErrors(error, PROFILE_FIELDS);
+
+  // Don't show an error left over from an earlier visit.
+  useEffect(() => {
+    dispatch(clearProfileError());
+  }, [dispatch]);
 
   const onShowModal = () => {
     setShowModal(true);
@@ -56,17 +74,21 @@ const EditAccount: FC = () => {
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(clearProfileError());
     const error = validateBirthday(birthday);
     setBirthdayError(error);
     if (error) return;
 
     dispatch(
       updateUserProfile({
-        firstname: name,
-        lastname: lastName,
-        birthday,
-        team: avatar.id,
-        platforms: [platform],
+        name: [name.trim(), lastName.trim()].filter(Boolean).join(" "),
+        phone,
+        extraFields: toExtraFields({
+          username: userId,
+          birthday,
+          platform: platform.game_machine,
+          gamer_tag: platform.game_id,
+        }),
       }),
     );
   };
@@ -112,6 +134,7 @@ const EditAccount: FC = () => {
               type="text"
               value={name}
               onChange={setName}
+              error={serverErrors.fieldErrors.name}
             />
             <FormInput
               label="Last Name"
@@ -119,6 +142,15 @@ const EditAccount: FC = () => {
               type="text"
               value={lastName}
               onChange={setLastName}
+            />
+            <FormInput
+              label="Phone"
+              placeholder="EX. +1234567890"
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={setPhone}
+              error={serverErrors.fieldErrors.phone}
             />
             <FormInput
               label="ID"
@@ -130,8 +162,18 @@ const EditAccount: FC = () => {
             />
             <BirthdayInput onDateChange={setBirthday} error={birthdayError} />
             <PlatformSelector platformChangeHandler={setPlatform} />
+            {serverErrors.formError && (
+              <p role="alert" className="text-red-error text-sm">
+                {serverErrors.formError}
+              </p>
+            )}
           </div>
-          <FormButton type="submit" title="save changes" className="mt-10" />
+          <FormButton
+            type="submit"
+            title="save changes"
+            disabled={loading}
+            className="mt-10"
+          />
         </form>
       </div>
     </Fragment>

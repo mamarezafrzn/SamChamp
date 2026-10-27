@@ -10,26 +10,22 @@ import { createAppAsyncThunk } from "@/store/createAppAsyncThunk";
 import { api } from "@/lib/api";
 import { toApiError } from "@/lib/api-error";
 import { removeAuthToken, setAuthToken } from "@/lib/auth-token";
-import type { ApiResponse } from "@/types/api";
 import type {
-  AuthData,
+  AuthResponse,
   LoginCredentials,
   RegisterCredentials,
 } from "@/types/auth";
-
-type AuthResponse = ApiResponse<AuthData>;
 
 type PlatformAuthRoute =
   | typeof API_ROUTES.AUTH.GOOGLE
   | typeof API_ROUTES.AUTH.FACEBOOK
   | typeof API_ROUTES.AUTH.APPLE;
 
-/** Waits for an auth request, saves the returned token and returns the response body. */
+/** Waits for an auth request, saves the returned token and returns the user. */
 async function authenticate(request: Promise<AxiosResponse<AuthResponse>>) {
   const { data } = await request;
-  const token = data.data.token?.access_token;
-  if (token) setAuthToken(token);
-  return data;
+  setAuthToken(data.token);
+  return data.user;
 }
 
 export const login = createAppAsyncThunk(

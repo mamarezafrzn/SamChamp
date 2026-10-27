@@ -4,13 +4,20 @@ export interface Platform {
   game_id: string;
 }
 
-/** Body sent to the update-profile endpoint. */
+/** A free-form profile value the backend stores by `key`. */
+export interface ExtraField {
+  /** `null` when sending a new value. */
+  id: number | null;
+  key: string;
+  type: string;
+  value: string;
+}
+
+/** Body sent to `POST /api/profile`. `bio` and `avatar` are optional and not sent yet. */
 export interface UpdateProfileRequest {
-  firstname: string;
-  lastname: string;
-  birthday: string;
-  team: number;
-  platforms: Platform[];
+  name: string;
+  phone: string;
+  extraFields: ExtraField[];
 }
 
 /** A team the user can pick as their avatar. */

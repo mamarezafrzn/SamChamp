@@ -23,7 +23,11 @@ const initialState: ProfileState = {
 const profileSlice = createSlice({
   name: "profile",
   initialState,
-  reducers: {},
+  reducers: {
+    clearProfileError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loggedOut, () => initialState)
@@ -42,4 +46,5 @@ const profileSlice = createSlice({
   },
 });
 
+export const { clearProfileError } = profileSlice.actions;
 export default profileSlice.reducer;
