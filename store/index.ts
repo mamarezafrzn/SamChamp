@@ -5,11 +5,13 @@ import {
 } from "@reduxjs/toolkit";
 
 import authReducer from "./slices/auth/authSlice";
+import clubsReducer from "./slices/clubs/clubsSlice";
 import profileReducer from "./slices/profile/profileSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    clubs: clubsReducer,
     profile: profileReducer,
   },
 });

@@ -3,8 +3,10 @@
 import { FC, useState } from "react";
 import Image from "next/image";
 
+import { fieldLabel } from "@/components/form/field";
 import FormInput from "@/components/form/form-input";
 
+import { cn } from "@/lib/cn";
 import type { Platform } from "@/types/profile";
 
 import pcIcon from "@/public/images/pc-icon.svg";
@@ -49,20 +51,20 @@ const PlatformSelector: FC<PlatformSelectorProps> = ({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <p className=" text-white text-sm font-normal">
-          Which platforms do you play on?
-        </p>
-        <div className="flex justify-between gap-4 w-full">
+        <p className={fieldLabel}>Which platforms do you play on?</p>
+        <div className="flex w-full justify-between gap-4">
           {PLATFORMS.map((platform) => (
             <button
               key={platform.id}
               type="button"
               aria-pressed={selectedPlatform === platform.id}
-              className={`flex flex-col items-center justify-center w-full h-12 rounded-lg cursor-pointer transition border text-white ${
+              // Selected tiles use the secondary colours; unselected ones look like fields.
+              className={cn(
+                "flex h-12 w-full cursor-pointer flex-col items-center justify-center rounded-lg border text-white transition",
                 selectedPlatform === platform.id
-                  ? "border-yellow-dark bg-brown-umber"
-                  : "border-grey-smoke bg-grey-smoke"
-              }`}
+                  ? "border-secondary-border bg-secondary"
+                  : "border-field bg-field",
+              )}
               onClick={() => toggleSelection(platform.id)}
             >
               <Image src={platform.icon} alt={platform.label} />
@@ -71,9 +73,10 @@ const PlatformSelector: FC<PlatformSelectorProps> = ({
         </div>
       </div>
       <div
-        className={`transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden ${
-          selectedPlatform ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={cn(
+          "overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out",
+          selectedPlatform ? "max-h-40 opacity-100" : "max-h-0 opacity-0",
+        )}
       >
         <FormInput
           label="Gamer Tag"

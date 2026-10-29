@@ -2,6 +2,10 @@
 
 import { FC, useId, useState } from "react";
 
+import { cn } from "@/lib/cn";
+
+import { fieldBox, FieldError, fieldLabel } from "./field";
+
 interface DateParts {
   day: string;
   month: string;
@@ -19,8 +23,8 @@ const toDateString = ({ day, month, year }: DateParts) =>
     ? `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`
     : "";
 
-const INPUT_CLASSES =
-  "text-center bg-transparent text-gray-200 placeholder-gray-500 outline-none";
+const PART_INPUT =
+  "bg-transparent text-center text-foreground-soft outline-none placeholder:text-hint";
 
 const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
   const labelId = useId();
@@ -37,14 +41,12 @@ const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
   };
 
   return (
-    <div className="flex flex-col text-white text-sm font-normal gap-1">
+    <div className={cn(fieldLabel, "flex flex-col gap-1")}>
       <label id={labelId}>Birthday</label>
       <div
         role="group"
         aria-labelledby={labelId}
-        className={`${
-          error && "border-red-error"
-        } flex items-center justify-around w-full h-[3.5rem] bg-grey-smoke border border-grey-silver rounded-2xl px-5 py-4`}
+        className={cn(fieldBox(!!error), "flex items-center justify-around")}
       >
         <input
           type="text"
@@ -54,9 +56,9 @@ const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
           maxLength={2}
           value={dateInput.day}
           onChange={(e) => inputChangeHandler("day", e.target.value)}
-          className={`w-12 ${INPUT_CLASSES}`}
+          className={cn("w-12", PART_INPUT)}
         />
-        <span className="text-gray-500">|</span>
+        <span className="text-hint">|</span>
         <input
           type="text"
           inputMode="numeric"
@@ -65,9 +67,9 @@ const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
           maxLength={2}
           value={dateInput.month}
           onChange={(e) => inputChangeHandler("month", e.target.value)}
-          className={`w-12 ${INPUT_CLASSES}`}
+          className={cn("w-12", PART_INPUT)}
         />
-        <span className="text-gray-500">|</span>
+        <span className="text-hint">|</span>
         <input
           type="text"
           inputMode="numeric"
@@ -76,10 +78,10 @@ const BirthdayInput: FC<BirthdayInputProps> = ({ onDateChange, error }) => {
           maxLength={4}
           value={dateInput.year}
           onChange={(e) => inputChangeHandler("year", e.target.value)}
-          className={`w-16 ${INPUT_CLASSES}`}
+          className={cn("w-16", PART_INPUT)}
         />
       </div>
-      {error && <p className="text-red-error">{error}</p>}
+      {error && <FieldError>{error}</FieldError>}
     </div>
   );
 };

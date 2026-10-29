@@ -4,9 +4,12 @@ import { APP_ROUTES } from "@/app/constants/appRoutes";
 
 import { AUTH_TOKEN_COOKIE } from "@/lib/auth-token";
 
+/** Pages that need a session. */
+const PROTECTED_PREFIXES = ["/home", "/profile"];
+
 /**
  * Routes users by session before a page renders:
- * `/` goes to the profile or login, `/profile` requires a session,
+ * `/` goes to home or login, protected pages require a session,
  * and `/auth` pages are only for logged-out users.
  */
 export function middleware(request: NextRequest) {
@@ -17,19 +20,20 @@ export function middleware(request: NextRequest) {
 
   // TODO: once `/` is the landing page, only redirect logged-in users here.
   if (pathname === "/") {
-    return redirectTo(
-      isLoggedIn ? APP_ROUTES.PROFILE.EDIT_ACCOUNT : APP_ROUTES.AUTH.LOGIN,
-    );
+    return redirectTo(isLoggedIn ? APP_ROUTES.HOME : APP_ROUTES.AUTH.LOGIN);
   }
-  if (!isLoggedIn && pathname.startsWith("/profile")) {
+  if (
+    !isLoggedIn &&
+    PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  ) {
     return redirectTo(APP_ROUTES.AUTH.LOGIN);
   }
   if (isLoggedIn && pathname.startsWith("/auth")) {
-    return redirectTo(APP_ROUTES.PROFILE.EDIT_ACCOUNT);
+    return redirectTo(APP_ROUTES.HOME);
   }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/profile/:path*", "/auth/:path*"],
+  matcher: ["/", "/home/:path*", "/profile/:path*", "/auth/:path*"],
 };

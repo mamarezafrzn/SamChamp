@@ -1,17 +1,25 @@
 "use client";
 
 import { FC, Fragment, SubmitEvent, useEffect, useState } from "react";
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+import { APP_ROUTES } from "@/app/constants/appRoutes";
 
 import BirthdayInput from "@/components/form/form-birthday-input";
-import FormButton from "@/components/form/form-button";
 import FormInput from "@/components/form/form-input";
+import Button from "@/components/ui/button";
+import FormError from "@/components/ui/form-error";
+import Page from "@/components/ui/page";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchClubs } from "@/store/slices/clubs/clubsActions";
 import { updateUserProfile } from "@/store/slices/profile/profileActions";
 import { clearProfileError } from "@/store/slices/profile/profileSlice";
 
 import { getFormErrors } from "@/lib/api-error";
+import { preloadImages } from "@/lib/preload-images";
+import type { Club } from "@/types/club";
 import type { ExtraField, Platform } from "@/types/profile";
 import { validateBirthday } from "@/utils/validation";
 
@@ -20,14 +28,6 @@ import PlatformSelector from "./components/platform-selector";
 
 import profileImg from "@/public/images/Brentford.svg";
 import editImg from "@/public/images/Edit.svg";
-
-interface Avatar {
-  flag: string | StaticImageData;
-  /** Team ID. Not sent yet: the backend has no team field so far. */
-  id: number;
-}
-
-const DEFAULT_AVATAR: Avatar = { flag: profileImg, id: 27 };
 
 const PROFILE_FIELDS = ["name", "phone"] as const;
 
@@ -39,9 +39,11 @@ const toExtraFields = (values: Record<string, string>): ExtraField[] =>
 
 const EditAccount: FC = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
-  const [avatar, setAvatar] = useState<Avatar>(DEFAULT_AVATAR);
+  // A club picked in the picker but not saved yet.
+  const [pickedClub, setPickedClub] = useState<Club | null>(null);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -54,22 +56,35 @@ const EditAccount: FC = () => {
   });
 
   const { loading, error } = useAppSelector((state) => state.profile);
+  const { leagues, selected: savedClub } = useAppSelector(
+    (state) => state.clubs,
+  );
   const serverErrors = getFormErrors(error, PROFILE_FIELDS);
 
-  // Don't show an error left over from an earlier visit.
+  // Show the newly picked club, else the saved one, else the default image.
+  const avatar = (pickedClub ?? savedClub)?.logo ?? profileImg;
+
+  // Don't show an error left over from an earlier visit; load the saved club.
   useEffect(() => {
     dispatch(clearProfileError());
+    dispatch(fetchClubs());
   }, [dispatch]);
+
+  // Download all club logos in the background now, so the avatar picker opens with
+  // them ready (the backend serves them slowly and doesn't let browsers cache them).
+  useEffect(() => {
+    if (leagues) {
+      preloadImages(
+        leagues.flatMap((league) => league.clubs.map((club) => club.logo)),
+      );
+    }
+  }, [leagues]);
 
   const onShowModal = () => {
     setShowModal(true);
   };
   const onHideModal = () => {
     setShowModal(false);
-  };
-
-  const onChangeAvatar = (flag: string, id: number) => {
-    setAvatar({ flag, id });
   };
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
@@ -81,14 +96,21 @@ const EditAccount: FC = () => {
 
     dispatch(
       updateUserProfile({
-        name: [name.trim(), lastName.trim()].filter(Boolean).join(" "),
-        phone,
-        extraFields: toExtraFields({
-          username: userId,
-          birthday,
-          platform: platform.game_machine,
-          gamer_tag: platform.game_id,
-        }),
+        profile: {
+          name: [name.trim(), lastName.trim()].filter(Boolean).join(" "),
+          phone,
+          extraFields: toExtraFields({
+            username: userId,
+            birthday,
+            platform: platform.game_machine,
+            gamer_tag: platform.game_id,
+          }),
+        },
+        // Only send the club when it changed.
+        clubId:
+          pickedClub && pickedClub.id !== savedClub?.id
+            ? pickedClub.id
+            : undefined,
       }),
     );
   };
@@ -98,32 +120,33 @@ const EditAccount: FC = () => {
       {showModal && (
         <AvatarSelectModal
           hideModal={onHideModal}
-          onChangeAvatar={onChangeAvatar}
-          avatar={avatar.flag}
+          onSelect={setPickedClub}
+          avatar={avatar}
         />
       )}
-      <div className="w-full flex flex-col gap-8 px-6 py-8">
-        <div className="flex flex-row justify-between">
-          <h1>Account</h1>
-          <button className="bg-grey-onyx rounded-3xl text-white py-1 px-4">
+      <Page
+        title="Account"
+        action={
+          <Button variant="chip" onClick={() => router.push(APP_ROUTES.HOME)}>
             Skip
-          </button>
-        </div>
+          </Button>
+        }
+      >
         <form onSubmit={handleSubmit}>
           <button
             type="button"
             onClick={onShowModal}
             aria-label="Change profile picture"
-            className="relative block w-fit m-auto mb-10 cursor-pointer"
+            className="relative m-auto mb-10 block w-fit cursor-pointer"
           >
             <Image
-              src={avatar.flag || profileImg}
+              src={avatar}
               alt="Profile Picture"
               width={100}
               height={100}
-              className="w-[100px] h-[100px] object-contain"
+              className="size-[100px] object-contain"
             />
-            <span className="bg-yellow-sun rounded-full p-2.5 absolute bottom-0 right-0">
+            <span className="absolute bottom-0 right-0 rounded-full bg-primary p-2.5">
               <Image src={editImg} alt="" />
             </span>
           </button>
@@ -162,20 +185,13 @@ const EditAccount: FC = () => {
             />
             <BirthdayInput onDateChange={setBirthday} error={birthdayError} />
             <PlatformSelector platformChangeHandler={setPlatform} />
-            {serverErrors.formError && (
-              <p role="alert" className="text-red-error text-sm">
-                {serverErrors.formError}
-              </p>
-            )}
+            <FormError message={serverErrors.formError} />
           </div>
-          <FormButton
-            type="submit"
-            title="save changes"
-            disabled={loading}
-            className="mt-10"
-          />
+          <Button type="submit" disabled={loading} className="mt-10">
+            save changes
+          </Button>
         </form>
-      </div>
+      </Page>
     </Fragment>
   );
 };

@@ -11,7 +11,11 @@ export const API_ROUTES = {
     PROFILE: {
       GET_PROFILE: "api/profile",
       UPDATE_PROFILE: "api/profile",
+      /** PUT `{ club_id }` */
+      CLUB: "api/samchamp/profile/club",
+      /** PUT `{ hide_balance }`; for the balance eye icon on Home. */
+      HIDE_BALANCE: "api/samchamp/profile/hide-balance",
     },
-    TEAMS: "api/teams/grouped-by-league",
   },
+  CLUBS: "api/samchamp/clubs",
 } as const;

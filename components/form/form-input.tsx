@@ -8,6 +8,10 @@ import {
 } from "react";
 import Image from "next/image";
 
+import { cn } from "@/lib/cn";
+
+import { fieldBox, FieldError, fieldLabel } from "./field";
+
 import hideImg from "@/public/images/hide.svg";
 import visibilityImg from "@/public/images/visibility.svg";
 
@@ -41,7 +45,7 @@ const FormInput: FC<FormInputProps> = ({
 
   const isPasswordType = type === "password";
   return (
-    <label className="relative w-full text-white text-sm font-normal flex flex-col gap-1">
+    <label className={cn(fieldLabel, "relative flex w-full flex-col gap-1")}>
       {label}
       <input
         type={isPasswordType && isPasswordVisible ? "text" : type}
@@ -50,12 +54,10 @@ const FormInput: FC<FormInputProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         maxLength={count}
-        className={`${
-          error && "border-red-error"
-        } w-full h-[3.5rem] bg-grey-smoke border border-grey-silver rounded-2xl px-5 py-4`}
+        className={fieldBox(!!error)}
       />
       {count !== undefined && (
-        <p className="absolute top-0 right-0">
+        <p className="absolute right-0 top-0">
           {value.length}/{count}
         </p>
       )}
@@ -63,9 +65,10 @@ const FormInput: FC<FormInputProps> = ({
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          className={`absolute h-[3.5rem] ${
-            error ? "bottom-6" : "bottom-0"
-          } right-4 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none`}
+          className={cn(
+            "absolute right-4 flex h-14 items-center focus:outline-none",
+            error ? "bottom-6" : "bottom-0",
+          )}
         >
           {isPasswordVisible ? (
             <Image src={visibilityImg} alt="Hide password" />
@@ -74,7 +77,7 @@ const FormInput: FC<FormInputProps> = ({
           )}
         </button>
       )}
-      {error && <p className="text-red-error">{error}</p>}
+      {error && <FieldError>{error}</FieldError>}
     </label>
   );
 };

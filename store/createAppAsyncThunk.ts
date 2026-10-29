@@ -2,7 +2,10 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import type { ApiError } from "@/types/api";
 
-/** `createAsyncThunk` whose rejected actions carry an `ApiError` payload. */
+import type { RootState } from "./index";
+
+/** `createAsyncThunk` typed with our state, and rejected actions carrying an `ApiError`. */
 export const createAppAsyncThunk = createAsyncThunk.withTypes<{
+  state: RootState;
   rejectValue: ApiError;
 }>();

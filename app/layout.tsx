@@ -11,7 +11,7 @@ import { Providers } from "./providers";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400"], // only used for "Or continue with"
   variable: "--font-roboto",
 });
 
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${roboto.variable} ${rubik.variable} font-rubik antialiased bg-black-rich max-w-xl m-auto`}
+        className={`${roboto.variable} ${rubik.variable} m-auto max-w-xl bg-background font-rubik antialiased`}
       >
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}

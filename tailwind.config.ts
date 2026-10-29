@@ -12,24 +12,42 @@ export default {
         rubik: ["var(--font-rubik)", ...defaultTheme.fontFamily.sans],
         roboto: ["var(--font-roboto)", ...defaultTheme.fontFamily.sans],
       },
-      colors: {
-        "black-rich": "#121212",
-        "yellow-sun": "rgba(242, 159, 5, 1)",
-        "yellow-sun-dark": "rgba(227, 147, 0, 1)",
-        "yellow-dark": "rgba(135, 95, 22, 1)",
-        "brown-umber": "rgba(37, 35, 23, 1)",
-        "grey-dark": "rgba(30, 30, 30, 1)",
-        "grey-charcoal": "rgba(35, 35, 35, 1)",
-        "grey-smoke": "rgba(44, 44, 44, 1)",
-        "grey-slate": "rgba(56, 56, 56, 1)",
-        "grey-silver": "rgba(116, 116, 116, 1)",
-        "grey-onyx": "rgba(37, 37, 37, 1)",
-        "white-ash": "rgba(165, 165, 165, 1)",
-        "green-success": "#3B9C00",
-        "red-error": "rgba(194, 55, 55, 1)",
+      fontSize: {
+        heading: "24px",
       },
-      width: {
-        "fill-available": "-webkit-fill-available",
+      borderRadius: {
+        card: "2rem",
+      },
+      // Named by purpose, so components never pick a raw shade.
+      colors: {
+        background: "#121212", // page background
+        foreground: {
+          DEFAULT: "#ededed", // default text
+          soft: "#e5e7eb", // birthday input text; not yet confirmed in Figma
+        },
+        surface: "#232323", // cards
+        chip: "#252525", // small pill buttons (e.g. "Skip")
+        tile: "#383838", // icon tile buttons (social login)
+        field: {
+          DEFAULT: "#2c2c2c", // input background
+          alt: "#1e1e1e", // search input background
+        },
+        subtle: "#747474", // field borders, dividers, quiet text
+        muted: "#a5a5a5", // secondary text
+        hint: "#6b7280", // birthday placeholders and separators; not yet confirmed in Figma
+        focus: "rgba(255, 255, 255, 0.87)", // focused input border
+        primary: {
+          DEFAULT: "#f29f05",
+          hover: "#e39300",
+          foreground: "#232323",
+        },
+        secondary: {
+          DEFAULT: "#252317",
+          border: "#875f16",
+          foreground: "#f29f05",
+        },
+        danger: "#c23737",
+        success: "#3b9c00",
       },
     },
   },

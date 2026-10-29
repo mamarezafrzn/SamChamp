@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "samchamp.apachish.ir",
-        pathname: "/logos/**",
+        pathname: "/display-image/**", // club logos
       },
     ],
   },

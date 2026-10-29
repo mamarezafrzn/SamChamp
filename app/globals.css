@@ -2,25 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The app has a dark design only, so text is light regardless of the OS theme. */
-body {
-  color: #ededed;
-}
-
-h1 {
-  color: white;
-  font-size: 24px;
-  font-weight: 500;
-}
-
-input:focus,
-input:focus::placeholder {
-  outline: white;
-  border-color: rgba(255, 255, 255, 0.87);
-  color: white;
-}
-
 @layer base {
+  /* The app has a dark design only, so text is light regardless of the OS theme. */
+  body {
+    color: theme("colors.foreground.DEFAULT");
+  }
+
+  h1 {
+    color: white;
+    font-size: theme("fontSize.heading");
+    font-weight: 500;
+  }
+
+  input:focus,
+  input:focus::placeholder {
+    outline: none;
+    border-color: theme("colors.focus");
+    color: white;
+  }
+
   /* All checkboxes are round; when checked, a white dot with a dark gap inside the ring. */
   input[type="checkbox"] {
     appearance: none;
@@ -28,7 +28,7 @@ input:focus::placeholder {
     height: 20px;
     border: 2px solid white;
     border-radius: 50%;
-    background-color: rgba(35, 35, 35, 1);
+    background-color: theme("colors.surface");
     outline: none;
     position: relative;
     transition:
@@ -40,7 +40,7 @@ input:focus::placeholder {
   input[type="checkbox"]:checked {
     background-color: white;
     border-color: white;
-    box-shadow: inset 0 0 0 3px rgba(35, 35, 35, 1);
+    box-shadow: inset 0 0 0 3px theme("colors.surface");
   }
 
   /* Keep the white ring when focused instead of the global input:focus border. */

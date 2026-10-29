@@ -1,23 +1,27 @@
 "use client";
 
 import { FC, SubmitEvent, useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { APP_ROUTES } from "@/app/constants/appRoutes";
 
-import FormButton from "@/components/form/form-button";
+import { fieldLabel } from "@/components/form/field";
 import FormInput from "@/components/form/form-input";
+import Button from "@/components/ui/button";
+import FormError from "@/components/ui/form-error";
+import TextLink from "@/components/ui/text-link";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { register } from "@/store/slices/auth/authActions";
 import { clearAuthError } from "@/store/slices/auth/authSlice";
 
 import { getFormErrors } from "@/lib/api-error";
+import { cn } from "@/lib/cn";
 import { validateEmail, validatePassword } from "@/utils/validation";
 
+import AuthLayout from "../components/auth-layout";
 import AuthPlatforms from "../components/auth-platforms";
+import AuthPrompt from "../components/auth-prompt";
 
 import frameImg from "@/public/images/register-frame.svg";
 
@@ -69,74 +73,59 @@ const Register: FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen relative">
-      <div className="absolute bottom-0 w-full max-h-full overflow-y-auto">
-        <Image src={frameImg} alt="Frame image" className="w-full mb-[-8%]" />
-        <div className="rounded-t-[2rem] bg-grey-charcoal p-6 pt-10">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <h1 className="mb-2">Register</h1>
-            <FormInput
-              label="E-mail"
-              placeholder="name@example.com"
-              type="text"
-              autoComplete="email"
-              value={email}
-              onChange={setEmail}
-              error={errors.email || serverErrors.fieldErrors.email}
-            />
-            <FormInput
-              label="Password"
-              placeholder="At least 8 characters"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={setPassword}
-              error={errors.password || serverErrors.fieldErrors.password}
-            />
-            <FormInput
-              label="Confirm Password"
-              placeholder="Re-type your password"
-              type="password"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              error={
-                errors.confirmPassword ||
-                serverErrors.fieldErrors.password_confirmation
-              }
-            />
-            <label
-              htmlFor="terms"
-              className="flex flex-row items-center text-white text-sm font-normal gap-2"
-            >
-              <input type="checkbox" id="terms" required />
-              By registering, you will accept our{" "}
-              <Link href="#" className="text-yellow-sun">
-                terms
-              </Link>
-            </label>
-            {serverErrors.formError && (
-              <p role="alert" className="text-red-error text-sm">
-                {serverErrors.formError}
-              </p>
-            )}
-            <FormButton
-              type="submit"
-              title="Register"
-              disabled={loading}
-              className="my-2"
-            />
-          </form>
-          <AuthPlatforms />
-          <p className="text-center text-white-ash font-normal text-sm">
-            Already a member?{" "}
-            <Link href={APP_ROUTES.AUTH.LOGIN} className="text-yellow-sun">
-              Login
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    <AuthLayout image={frameImg} imageClassName="mb-[-8%] w-full">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <h1 className="mb-2">Register</h1>
+        <FormInput
+          label="E-mail"
+          placeholder="name@example.com"
+          type="text"
+          autoComplete="email"
+          value={email}
+          onChange={setEmail}
+          error={errors.email || serverErrors.fieldErrors.email}
+        />
+        <FormInput
+          label="Password"
+          placeholder="At least 8 characters"
+          type="password"
+          autoComplete="new-password"
+          value={password}
+          onChange={setPassword}
+          error={errors.password || serverErrors.fieldErrors.password}
+        />
+        <FormInput
+          label="Confirm Password"
+          placeholder="Re-type your password"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          error={
+            errors.confirmPassword ||
+            serverErrors.fieldErrors.password_confirmation
+          }
+        />
+        <label
+          htmlFor="terms"
+          className={cn(fieldLabel, "flex flex-row items-center gap-2")}
+        >
+          <input type="checkbox" id="terms" required />
+          By registering, you will accept our{" "}
+          <TextLink href="#">terms</TextLink>
+        </label>
+        <FormError message={serverErrors.formError} />
+        <Button type="submit" disabled={loading} className="my-2">
+          Register
+        </Button>
+      </form>
+      <AuthPlatforms />
+      <AuthPrompt
+        text="Already a member?"
+        linkText="Login"
+        href={APP_ROUTES.AUTH.LOGIN}
+      />
+    </AuthLayout>
   );
 };
 

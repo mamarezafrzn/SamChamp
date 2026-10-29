@@ -19,13 +19,3 @@ export interface UpdateProfileRequest {
   phone: string;
   extraFields: ExtraField[];
 }
-
-/** A team the user can pick as their avatar. */
-export interface Team {
-  id: number;
-  title: string;
-  flag: string;
-}
-
-/** Teams grouped by league name, as returned by the teams endpoint. */
-export type TeamsByLeague = Record<string, Team[]>;
